@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
+
+    <style>
+      .container {
+        margin-top: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+      <div class="d-flex justify-content-center" style="width: 100%">
+        <a class="navbar-brand" href="#">LinkedIn Navigator</a>
+      </div>
+    </nav>
+
+    <main role="main" class="container">
+      <section class="search">
+        <form action="/search" method="POST">
+          <div class="d-flex">
+            <div class="form-group" style="flex: 1; margin-right: 15px">
+              <input
+                class="form-control"
+                name="search_term"
+                placeholder="Enter search term"
+              />
+            </div>
+            <div class="form-group" style="margin-right: 15px">
+              <input
+                class="form-control"
+                name="tags"
+                placeholder="Filter tags"
+              />
+            </div>
+
+            <div class="form-group">
+              <button type="submit" class="btn btn-primary">
+                Search
+              </button>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <section class="connections">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <td>Name</td>
+              <td>Contact Information</td>
+            </tr>
+          </thead>
+          <tbody id="connections-data">
+            <tr>
+              <td colspan="2">Loading...</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+    <!-- /.container -->
+
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+      integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      $(function() {
+        $.get("/profiles").then(profiles => {
+          const profilesMarkup = profiles
+            .map(
+              profile => `
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                <img width="70" height="70" style="border-radius: 100%; margin-right: 10px; border: 1px solid #ccc;" src="${
+                  profile.avatar.indexOf("base64") > -1
+                    ? "./default-avatar.jpg"
+                    : profile.avatar
+                }" alt="${profile.username}">
+                ${profile.profile.name} (@${profile.username})
+              </div>
+            </td>
+            <td>
+              <div class="d-flex align-items-center">
+                ${profile.contact
+                  .map(item => `${item.type}: ${item.values.join(", ")}`)
+                  .join("<br>")}
+              </div>
+            </td>
+          </tr>
+          `
+            )
+            .join("");
+
+          $("#connections-data").html(profilesMarkup);
+        });
+      });
+    </script>
+  </body>
+</html>

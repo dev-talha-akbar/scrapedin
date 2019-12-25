@@ -30,7 +30,7 @@ async function scrape() {
   console.info("Connections fetched. Fetching profiles...");
 
   for (let i = 0; i < connections.length; i++) {
-    const { name, profile: profileLink, username } = connections[i];
+    const { name, profile: profileLink, username, avatar } = connections[i];
 
     const profilesCollection = db.collection("profiles");
 
@@ -41,7 +41,12 @@ async function scrape() {
       const profile = await Scraper.profileScraper(profileLink);
       await profilesCollection.insertOne({
         ...profile,
-        username
+        username,
+        avatar
+      });
+
+      await new Promise((resolve, reject) => {
+        setTimeout(resolve, 1000);
       });
     } else {
       console.info(
