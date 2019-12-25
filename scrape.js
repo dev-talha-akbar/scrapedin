@@ -20,22 +20,34 @@ async function scrape() {
   });
 
   console.info("Login complete. Fetching all connections...");
-  const connections = await Scraper.connectionScraper();
-
-  const connectionsCollection = db.collection("connections");
-  await connectionsCollection.insertMany(connections);
+  const connections = (await Scraper.connectionScraper()).map(connection => {
+    return {
+      ...connection,
+      username: connection.profile.split("/")[4]
+    };
+  });
 
   console.info("Connections fetched. Fetching profiles...");
 
-  for (let i = 0; i < 5; i++) {
-    const { name, profile: profileLink } = connections[i];
-    console.info(`Fetching profile for ${name} @ ${profileLink}`);
-
-    const profile = await Scraper.profileScraper(profileLink);
+  for (let i = 0; i < connections.length; i++) {
+    const { name, profile: profileLink, username } = connections[i];
 
     const profilesCollection = db.collection("profiles");
 
-    await profilesCollection.insertOne(profile);
+    const dbProfile = await profilesCollection.findOne({ username });
+
+    if (!dbProfile) {
+      console.info(`Fetching profile for ${name} @ ${profileLink}`);
+      const profile = await Scraper.profileScraper(profileLink);
+      await profilesCollection.insertOne({
+        ...profile,
+        username
+      });
+    } else {
+      console.info(
+        `Skipping... profile for ${name} @ ${profileLink} already in DB`
+      );
+    }
   }
 
   console.info("Profiles fetched. Finishing...");

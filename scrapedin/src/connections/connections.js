@@ -52,7 +52,11 @@ module.exports = async (browser, cookies, waitTimeToScrapMs = 500) => {
         selector: "a.mn-connection-card__link",
         attribute: "href"
       },
-      name: ".mn-connection-card__name"
+      name: ".mn-connection-card__name",
+      avatar: {
+        selector: "img.presence-entity__image",
+        attribute: "src"
+      }
     }
   });
 

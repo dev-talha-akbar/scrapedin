@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "dotenv": "^8.2.0",
+    "express": "^4.17.1",
     "mongodb": "^2.2.36",
     "scrapedin": "file:scrapedin"
   },
