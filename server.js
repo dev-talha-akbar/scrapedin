@@ -21,6 +21,7 @@ app.get("/profiles", async (req, res) => {
     username: 1,
     avatar: 1,
     "profile.name": 1,
+    "profile.headline": 1,
     contact: 1
   });
 
