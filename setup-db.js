@@ -1,11 +1,11 @@
 require("dotenv").config();
 
-const { MONGODB_URL } = process.env;
+const { MONGODB_URI } = process.env;
 
 const MongoClient = require("mongodb").MongoClient;
 
 async function setup() {
-  const db = await MongoClient.connect(MONGODB_URL);
+  const db = await MongoClient.connect(MONGODB_URI);
 
   const profilesCollection = db.collection("profiles");
 

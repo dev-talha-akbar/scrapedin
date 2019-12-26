@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const { MONGODB_URL, LINKEDIN_EMAIL, LINKEDIN_PASSWORD } = process.env;
+const { MONGODB_URI, LINKEDIN_EMAIL, LINKEDIN_PASSWORD } = process.env;
 
 const scrapedin = require("./scrapedin/src/scrapedin");
 const MongoClient = require("mongodb").MongoClient;
@@ -10,7 +10,7 @@ async function scrape() {
   const scriptStart = process.hrtime();
 
   console.info("Connecting to DB");
-  const db = await MongoClient.connect(MONGODB_URL);
+  const db = await MongoClient.connect(MONGODB_URI);
 
   console.info("Logging into the configured LinkedIn account...");
   const Scraper = await scrapedin({

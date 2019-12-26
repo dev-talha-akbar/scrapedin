@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const { MONGODB_URL } = process.env;
+const { MONGODB_URI } = process.env;
 
 const express = require("express");
 const MongoClient = require("mongodb").MongoClient;
@@ -14,7 +14,7 @@ app.get("/", function() {
 });
 
 app.get("/profiles", async (req, res) => {
-  const db = await MongoClient.connect(MONGODB_URL);
+  const db = await MongoClient.connect(MONGODB_URI);
   const profilesCollection = db.collection("profiles");
   const profiles = [];
   const dbProfiles = await profilesCollection.find(undefined, {
@@ -37,7 +37,7 @@ app.get("/profiles", async (req, res) => {
 });
 
 app.get("/profile/:username", async (req, res) => {
-  const db = await MongoClient.connect(MONGODB_URL);
+  const db = await MongoClient.connect(MONGODB_URI);
   const { username } = req.params;
 
   const profilesCollection = db.collection("profiles");
