@@ -5,3 +5,16 @@
   min-height: 70px;
   min-width: 70px;
 }
+.search {
+  padding: 0 25px;
+}
+h5 {
+  margin: 25px 0;
+}
+.more-view td {
+  padding-bottom: 25px;
+  padding-left: 25px;
+}
+.more-view-content {
+  max-width: 50%;
+}

@@ -33,8 +33,6 @@ async function scrape() {
 
   console.info("Connections fetched. Fetching profiles...");
 
-  let allTags = [];
-
   try {
     let processed = 0;
 
@@ -76,9 +74,9 @@ async function scrape() {
         let tags = [];
 
         if (profile.positions.length > 0) {
-          const { title, companyName, location } = profile.positions[0];
+          const { title } = profile.positions[0];
 
-          tags = [title, companyName, location];
+          tags = [title];
         }
 
         await profilesCollection.insertOne({
@@ -87,8 +85,6 @@ async function scrape() {
           avatar,
           tags
         });
-
-        allTags = [...allTags, ...tags];
 
         await new Promise((resolve, reject) => {
           setTimeout(resolve, 2500);
@@ -106,13 +102,6 @@ async function scrape() {
   } catch (e) {
     console.log(e);
   } finally {
-    const tagsCollection = db.collection("tags");
-    allTags = allTags.filter(onlyUnique).map(tagName => ({
-      name: tagName
-    }));
-
-    await tagsCollection.insertMany(allTags);
-
     db.close();
 
     const scriptEnd = process.hrtime(scriptStart);

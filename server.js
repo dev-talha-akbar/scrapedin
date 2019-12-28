@@ -9,7 +9,7 @@ const MongoClient = require("mongodb").MongoClient;
 const app = express();
 
 app.use(express.static("public"));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/", function() {
   res.sendFile("public/index.html");
@@ -20,22 +20,48 @@ app.post("/search", async (req, res) => {
   const profilesCollection = db.collection("profiles");
   const profiles = [];
 
-  const { search_term, filter_tags } = req.params;
+  const { search_term, filter_tags } = req.body;
 
-  const dbProfiles = await profilesCollection.find(
-    {
-      "profile.name": {
-        $regex: search_term
+  const filter_tags_arr = filter_tags
+    ? typeof filter_tags === "string"
+      ? [filter_tags]
+      : filter_tags
+    : [];
+  const filter_tags_regexp = filter_tags_arr.map(tag => new RegExp(tag, "i"));
+
+  let searchFilter;
+
+  if (search_term || filter_tags_regexp.length) {
+    searchFilter = {};
+  }
+
+  if (search_term) {
+    searchFilter = {
+      $or: [
+        { "profile.name": new RegExp(search_term, "i") },
+        { "profile.headline": new RegExp(search_term, "i") },
+        { username: new RegExp(search_term, "i") }
+      ]
+    };
+  }
+
+  if (filter_tags_regexp.length) {
+    searchFilter = {
+      ...searchFilter,
+      tags: {
+        $in: filter_tags_regexp
       }
-    },
-    {
-      username: 1,
-      avatar: 1,
-      "profile.name": 1,
-      "profile.headline": 1,
-      contact: 1
-    }
-  );
+    };
+  }
+
+  const dbProfiles = await profilesCollection.find(searchFilter, {
+    username: 1,
+    avatar: 1,
+    "profile.name": 1,
+    "profile.headline": 1,
+    contact: 1,
+    tags: 1
+  });
 
   dbProfiles.each((err, item) => {
     if (item === null) {
@@ -48,20 +74,27 @@ app.post("/search", async (req, res) => {
   });
 });
 
-app.get("/tags", async (req, res) => {
+app.post("/profile/:username/tags", async (req, res) => {
   const db = await MongoClient.connect(MONGODB_URI);
-  const tagsCollection = db.collection("tags");
-  const tags = [];
-  const dbTags = await tagsCollection.find();
+  const profilesCollection = db.collection("profiles");
+  const { username } = req.params;
+  const { tags: _tags } = req.body;
 
-  dbTags.each((err, item) => {
-    if (item === null) {
-      db.close();
-      res.json(tags);
-      return;
+  const tags = _tags ? (typeof _tags === "string" ? [_tags] : _tags) : [];
+
+  await profilesCollection.update(
+    {
+      username
+    },
+    {
+      $set: {
+        tags
+      }
     }
+  );
 
-    tags.push(item);
+  res.json({
+    success: true
   });
 });
 
@@ -74,7 +107,8 @@ app.get("/profiles", async (req, res) => {
     avatar: 1,
     "profile.name": 1,
     "profile.headline": 1,
-    contact: 1
+    contact: 1,
+    tags: 1
   });
 
   dbProfiles.each((err, item) => {
