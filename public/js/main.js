@@ -8,12 +8,14 @@ function editTags(elem) {
   initSelect2($parent.find(".contact-tags-input"), "Contact tags");
 }
 
-function showMore() {
-  $("#connections-data .more-view").remove();
+var tops = {};
 
+function showMore() {
   const $link = $(this);
   const username = $link.attr("data-username");
   const $row = $link.parents("tr").first();
+  const myTopIndex = "p" + $("#connections-data tr").index($row);
+  tops[myTopIndex] = $row.offset().top - 60;
 
   $.get(`/profile/${username}`).then(profile => {
     const $moreView = $('<tr class="more-view"></tr>');
@@ -85,6 +87,27 @@ function showMore() {
     `);
 
     $row.after($moreView);
+
+    for (
+      let i = parseInt(myTopIndex.substr(1), 10) + 1;
+      i < $("#connections-data tr").length;
+      i++
+    ) {
+      if (tops[`p${i}`]) {
+        tops[`p${i}`] += $moreView.height();
+      }
+    }
+
+    $(window).scroll(function() {
+      if (
+        $(window).scrollTop() >= tops[myTopIndex] &&
+        $(window).scrollTop() < tops[myTopIndex] + $moreView.height() - 95
+      ) {
+        $row.addClass("fixed-view");
+      } else {
+        $row.removeClass("fixed-view");
+      }
+    });
   });
 }
 
@@ -155,7 +178,7 @@ function showProfiles(profiles) {
           </div>
         </td>
         <td>
-          <div class="d-flex align-items-center">
+          <div class="d-flex align-items-center" style="padding-top: 10px; width: 100%;">
             <div>
             ${
               emails.length > 0
@@ -166,7 +189,7 @@ function showProfiles(profiles) {
           </div>
         </td>
         <td>
-          <div class="d-flex align-items-center">
+          <div class="d-flex align-items-center" style="padding-top: 10px; width: 100%;">
             <div>
             ${
               phones.length > 0

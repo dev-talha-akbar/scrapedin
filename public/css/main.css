@@ -18,3 +18,18 @@ h5 {
 .more-view-content {
   max-width: 50%;
 }
+.fixed-view {
+  position: fixed;
+  top: 55px;
+  background: #fff;
+  width: 100%;
+  left: 0;
+  right: 0;
+  display: table-row;
+}
+.fixed-view td:not(:first-child) {
+  display: none !important;
+}
+.fixed-view + .more-view .more-view-content {
+  padding-top: 95px;
+}
