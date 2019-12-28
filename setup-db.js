@@ -19,6 +19,16 @@ async function setup() {
 
   await profilesCollection.createIndex({ username: 1 }, { unique: true });
 
+  const tagsCollection = db.collection("tags");
+
+  try {
+    await tagsCollection.drop();
+  } catch (e) {
+    if (e.code !== 26) {
+      throw e;
+    }
+  }
+
   await db.close();
 }
 

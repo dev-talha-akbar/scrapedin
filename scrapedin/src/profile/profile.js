@@ -50,6 +50,8 @@ module.exports = async (
     });
   }
 
+  await page.waitFor("a[data-control-name=contact_see_more]");
+
   const contact = hasToGetContactInfo ? await contactInfo(page) : {};
   const [profileLegacy] = await scrapSection(page, template.profileLegacy);
   const [profileAlternative] = await scrapSection(

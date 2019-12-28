@@ -12,15 +12,7 @@
       rel="stylesheet"
     />
 
-    <style>
-      .container {
-        margin-top: 100px;
-      }
-      .avatar {
-        min-height: 70px;
-        min-width: 70px;
-      }
-    </style>
+    <link href="css/main.css" rel="stylesheet" />
   </head>
   <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
@@ -31,7 +23,7 @@
 
     <main role="main" class="container">
       <section class="search">
-        <form action="/search" method="POST">
+        <form id="search-form" action="/search" method="POST">
           <div class="d-flex">
             <div class="form-group" style="flex: 1; margin-right: 15px">
               <input
@@ -48,10 +40,6 @@
                 placeholder="Filter tags"
                 multiple
               >
-                <option value="Investor">Investor</option>
-                <option value="Banker">Banker</option>
-                <option value="Software Engineer">Software Engineer</option>
-                <option value="Web Developer">Web Developer</option>
               </select>
             </div>
             <div class="form-group">
@@ -93,131 +81,6 @@
       crossorigin="anonymous"
     ></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
-    <script>
-      function editTags(elem) {
-        const $parent = $(elem).parents(".contact-tags-container");
-
-        $parent.find(".contact-tags-form").removeClass("d-none");
-
-        $parent.find(".contact-tags").addClass("d-none");
-
-        initSelect2($parent.find(".contact-tags-input"), "Contact tags");
-      }
-
-      function saveTags(elem) {
-        const $parent = $(elem).parents(".contact-tags-container");
-
-        const tags = $parent.find(".contact-tags-input").val();
-
-        if (tags.length === 0) {
-          $parent
-            .find(".contact-tags .tags")
-            .html('<em class="text-muted">No tags yet...</em>');
-        } else {
-          $parent.find(".contact-tags .tags").html(tags.join(", "));
-        }
-
-        $parent.find(".contact-tags-form").addClass("d-none");
-
-        $parent.find(".contact-tags").removeClass("d-none");
-      }
-
-      function initSelect2($elem, placeholder) {
-        $elem.select2({
-          tags: true,
-          placeholder,
-          createTag: function(params) {
-            return {
-              id: params.term,
-              text: params.term,
-              newOption: true
-            };
-          },
-          templateResult: function(data) {
-            var $result = $("<span></span>");
-
-            $result.text(data.text);
-
-            if (data.newOption) {
-              $result.append(" <em>(new)</em>");
-            }
-
-            return $result;
-          }
-        });
-      }
-
-      $(function() {
-        initSelect2($("#filter-tags"), "Filter tags");
-
-        $.get("/profiles").then(profiles => {
-          const profilesMarkup = profiles
-            .map(
-              profile => `
-          <tr>
-            <td>
-              <div class="d-flex align-items-center">
-                <img class="avatar" width="70" height="70" style="border-radius: 100%; margin-right: 10px; border: 1px solid #ccc;" src="${
-                  profile.avatar.indexOf("base64") > -1
-                    ? "./default-avatar.jpg"
-                    : profile.avatar
-                }" alt="${profile.username}">
-                <div>
-                  <a href="javascript:void(0)">${profile.profile.name}</a>
-                  <span>(@${profile.username})</span>
-                  <br>
-                  ${profile.profile.headline}
-                </div>
-              </div>
-            </td>
-            <td style="width: 25%;">
-              <div class="contact-tags-container" style="padding-top: 10px; width: 100%;">
-                <div style="width: 100%">
-                <div class="contact-tags">
-                  <span class="tags">
-                    <em class="text-muted">No tags yet...</em>
-                  </span>
-                  <a href="javascript:void(0)" onclick="editTags(this)" style="font-size: 0.75rem;">Edit tags</a>
-                </div>
-                <div class="contact-tags-form d-none">
-                  <select
-                    class="contact-tags-input"
-                    name="filter_item_tags[]"
-                    class="form-control"
-                    style="width: 100%; display: block;"
-                    placeholder="Contact tags"
-                    multiple
-                  >
-                    <option value="Investor">Investor</option>
-                    <option value="Banker">Banker</option>
-                    <option value="Software Engineer">Software Engineer</option>
-                    <option value="Web Developer">Web Developer</option>
-                  </select>
-
-                  <div style="width: 100%; display: block; margin-top: 10px;" >
-                    <button class="btn btn-primary btn-sm" href="javascript:void(0)" onclick="saveTags(this)">Save Tags</button>
-                  </div>
-                  </div>
-                </div>
-              </div>
-            </td>
-            <td>
-              <div class="d-flex align-items-center">
-                <div>
-                ${profile.contact
-                  .map(item => `<b>${item.type}</b>: ${item.values.join(", ")}`)
-                  .join("<br>")}
-                </div>
-              </div>
-            </td>
-          </tr>
-          `
-            )
-            .join("");
-
-          $("#connections-data").html(profilesMarkup);
-        });
-      });
-    </script>
+    <script src="js/main.js"></script>
   </body>
 </html>
