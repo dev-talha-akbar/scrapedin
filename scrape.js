@@ -5,10 +5,6 @@ const { MONGODB_URI, LINKEDIN_EMAIL, LINKEDIN_PASSWORD } = process.env;
 const scrapedin = require("./scrapedin/src/scrapedin");
 const MongoClient = require("mongodb").MongoClient;
 
-function onlyUnique(value, index, self) {
-  return self.indexOf(value) === index;
-}
-
 async function scrape() {
   console.info("Starting scraper");
   const scriptStart = process.hrtime();
@@ -37,30 +33,6 @@ async function scrape() {
     let processed = 0;
 
     for (let i = 0; i < connections.length; i++) {
-      if (processed % 50 === 0) {
-        await new Promise((resolve, reject) => {
-          setTimeout(resolve, 60000);
-        });
-      }
-
-      if (processed % 25 === 0) {
-        await new Promise((resolve, reject) => {
-          setTimeout(resolve, 30000);
-        });
-      }
-
-      if (processed % 10 === 0) {
-        await new Promise((resolve, reject) => {
-          setTimeout(resolve, 15000);
-        });
-      }
-
-      if (processed % 5 === 0) {
-        await new Promise((resolve, reject) => {
-          setTimeout(resolve, 5000);
-        });
-      }
-
       const { name, profile: profileLink, username, avatar } = connections[i];
 
       const profilesCollection = db.collection("profiles");
@@ -68,6 +40,30 @@ async function scrape() {
       const dbProfile = await profilesCollection.findOne({ username });
 
       if (!dbProfile) {
+        if (processed % 50 === 0) {
+          await new Promise((resolve, reject) => {
+            setTimeout(resolve, Math.random() * 130000 + 50000);
+          });
+        }
+
+        if (processed % 25 === 0) {
+          await new Promise((resolve, reject) => {
+            setTimeout(resolve, Math.random() * 100000 + 35000);
+          });
+        }
+
+        if (processed % 10 === 0) {
+          await new Promise((resolve, reject) => {
+            setTimeout(resolve, Math.random() * 70000 + 20000);
+          });
+        }
+
+        if (processed % 5 === 0) {
+          await new Promise((resolve, reject) => {
+            setTimeout(resolve, Math.random() * 40000 + 10000);
+          });
+        }
+
         console.info(`Fetching profile for ${name} @ ${profileLink}`);
         const profile = await Scraper.profileScraper(profileLink);
 
@@ -86,16 +82,12 @@ async function scrape() {
           tags
         });
 
-        await new Promise((resolve, reject) => {
-          setTimeout(resolve, 2500);
-        });
+        processed++;
       } else {
         console.info(
           `Skipping... profile for ${name} @ ${profileLink} already in DB`
         );
       }
-
-      processed++;
     }
 
     console.info("Profiles fetched. Finishing...");

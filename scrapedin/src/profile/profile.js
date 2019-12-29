@@ -26,6 +26,16 @@ module.exports = async (
       logger.warn("profile", "profile selector was not found");
     });
 
+  let elem;
+  let rect;
+
+  elem = await page.$(".pv-profile-section");
+  rect = await page.evaluate(_elem => {
+    const { top, left, bottom, right } = _elem.getBoundingClientRect();
+    return { top, left, bottom, right };
+  }, elem);
+  await page.mouse.move(rect.top, rect.left);
+
   logger.info("profile", "scrolling page to the bottom");
   await scrollToPageBottom(page);
 
@@ -49,8 +59,6 @@ module.exports = async (
       }, waitTimeToScrapMs / 2);
     });
   }
-
-  await page.waitFor("a[data-control-name=contact_see_more]");
 
   const contact = hasToGetContactInfo ? await contactInfo(page) : {};
   const [profileLegacy] = await scrapSection(page, template.profileLegacy);
@@ -85,6 +93,10 @@ module.exports = async (
   );
   const peopleAlsoViewed = await scrapSection(page, template.peopleAlsoViewed);
   const interests = await scrapSection(page, template.interests);
+
+  await new Promise((resolve, reject) => {
+    setTimeout(resolve, Math.random() * 2500 + 2000);
+  });
 
   await page.close();
   logger.info("profile", `finished scraping url: ${url}`);

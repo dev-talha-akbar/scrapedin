@@ -21,7 +21,10 @@ module.exports = async (
   logger.info("scrapedin", "initializing");
 
   const args = Object.assign(
-    { headless: isHeadless, args: ["--no-sandbox"] },
+    {
+      headless: isHeadless,
+      args: ["--no-sandbox"]
+    },
     puppeteerArgs
   );
   const browser = await puppeteer.launch(args);
