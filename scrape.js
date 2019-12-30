@@ -1,6 +1,11 @@
 require("dotenv").config();
 
-const { MONGODB_URI, LINKEDIN_EMAIL, LINKEDIN_PASSWORD } = process.env;
+const {
+  MONGODB_URI,
+  LINKEDIN_EMAIL,
+  LINKEDIN_PASSWORD,
+  MAX_PROFILES_PER_SESSION
+} = process.env;
 
 const scrapedin = require("./scrapedin/src/scrapedin");
 const MongoClient = require("mongodb").MongoClient;
@@ -36,7 +41,7 @@ async function scrape() {
         basic: 1
       }
     )
-    .limit(1);
+    .limit(parseInt(MAX_PROFILES_PER_SESSION, 10));
   const connections = await dbBasicConnections.toArray();
   console.info("Connections fetched. Fetching profiles...");
 

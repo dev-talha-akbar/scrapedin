@@ -73,6 +73,7 @@ app.post("/search", async (req, res) => {
     avatar: 1,
     "profile.name": 1,
     "profile.headline": 1,
+    "profile.location": 1,
     contact: 1,
     tags: 1,
     basic: 1
@@ -122,6 +123,7 @@ app.get("/profiles", async (req, res) => {
     avatar: 1,
     "profile.name": 1,
     "profile.headline": 1,
+    "profile.location": 1,
     contact: 1,
     tags: 1,
     basic: 1

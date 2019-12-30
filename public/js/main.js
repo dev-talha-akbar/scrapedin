@@ -54,7 +54,9 @@ function showMore() {
               <b>${position.date1 || position.date2 || "Date Unknown"}:</b> ${
                       position.title
                     } at ${position.companyName} ${
-                      position.location ? `in ${position.location}` : ""
+                      typeof position.location !== "undefined"
+                        ? `in ${position.location}`
+                        : ""
                     }
             </div>
             `
@@ -116,7 +118,7 @@ function showProfiles(profiles, chunkIndex) {
     .map(profile => {
       const emails = profile.contact.filter(item => item.type === "Email");
       const phones = profile.contact.filter(item => item.type === "Phone");
-      const location = profile.location;
+      const location = profile.profile.location;
       const websites = profile.contact.filter(item => item.type === "Website");
 
       return `
