@@ -20,74 +20,58 @@ async function scrape() {
   });
 
   console.info("Login complete. Fetching all connections...");
-  const connections = (await Scraper.connectionScraper()).map(connection => {
-    return {
-      ...connection,
-      username: connection.profile.split("/")[4]
-    };
-  });
-
+  const profilesCollection = db.collection("profiles");
+  const dbBasicConnections = await profilesCollection
+    .find(
+      {
+        basic: true
+      },
+      {
+        username: 1,
+        avatar: 1,
+        "profile.name": 1,
+        "profile.headline": 1,
+        contact: 1,
+        tags: 1,
+        basic: 1
+      }
+    )
+    .limit(1);
+  const connections = await dbBasicConnections.toArray();
   console.info("Connections fetched. Fetching profiles...");
 
+  let processed = 0;
   try {
-    let processed = 0;
-
     for (let i = 0; i < connections.length; i++) {
-      const { name, profile: profileLink, username, avatar } = connections[i];
+      const {
+        _id,
+        avatar,
+        tags,
+        username,
+        profile: { name }
+      } = connections[i];
 
-      const profilesCollection = db.collection("profiles");
+      const url = `https://www.linkedin.com/in/${username}`;
 
-      const dbProfile = await profilesCollection.findOne({ username });
+      console.info(`Fetching profile for ${name} @ ${url}`);
+      const profile = await Scraper.profileScraper(url, 45000);
 
-      if (!dbProfile) {
-        if (processed % 50 === 0) {
-          await new Promise((resolve, reject) => {
-            setTimeout(resolve, Math.random() * 130000 + 50000);
-          });
-        }
+      console.log(profile);
 
-        if (processed % 25 === 0) {
-          await new Promise((resolve, reject) => {
-            setTimeout(resolve, Math.random() * 100000 + 35000);
-          });
-        }
-
-        if (processed % 10 === 0) {
-          await new Promise((resolve, reject) => {
-            setTimeout(resolve, Math.random() * 70000 + 20000);
-          });
-        }
-
-        if (processed % 5 === 0) {
-          await new Promise((resolve, reject) => {
-            setTimeout(resolve, Math.random() * 40000 + 10000);
-          });
-        }
-
-        console.info(`Fetching profile for ${name} @ ${profileLink}`);
-        const profile = await Scraper.profileScraper(profileLink, 120000);
-
-        let tags = [];
-
-        if (profile.positions.length > 0) {
-          const { title } = profile.positions[0];
-
-          tags = [title];
-        }
-
-        await profilesCollection.insertOne({
+      await profilesCollection.replaceOne(
+        {
+          _id
+        },
+        {
           ...profile,
-          username,
+          tags,
           avatar,
-          tags
-        });
+          username,
+          basic: false
+        }
+      );
 
-        processed++;
-      } else {
-        console.info(
-          `Skipping... profile for ${name} @ ${profileLink} already in DB`
-        );
-      }
+      processed++;
     }
 
     console.info("Profiles fetched. Finishing...");
@@ -97,6 +81,7 @@ async function scrape() {
     db.close();
 
     const scriptEnd = process.hrtime(scriptStart);
+    console.log(`Processed: ${processed}`);
     console.info(
       "Execution time (hr): %ds %dms",
       scriptEnd[0],

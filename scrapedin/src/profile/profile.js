@@ -73,28 +73,11 @@ module.exports = async (
   );
   const positions = await scrapSection(page, template.positions);
   const educations = await scrapSection(page, template.educations);
-  const [recommendationsCount] = await scrapSection(
-    page,
-    template.recommendationsCount
-  );
-  const recommendationsReceived = await scrapSection(
-    page,
-    template.recommendationsReceived
-  );
-  const recommendationsGiven = await scrapSection(
-    page,
-    template.recommendationsGiven
-  );
-  const skills = await scrapSection(page, template.skills);
-  const accomplishments = await scrapSection(page, template.accomplishments);
-  const volunteerExperience = await scrapSection(
-    page,
-    template.volunteerExperience
-  );
-  const peopleAlsoViewed = await scrapSection(page, template.peopleAlsoViewed);
   const interests = await scrapSection(page, template.interests);
 
-  await page.close();
+  setTimeout(() => {
+    page.close();
+  }, waitTimeToScrapMs * 3);
   logger.info("profile", `finished scraping url: ${url}`);
 
   const rawProfile = {
@@ -105,16 +88,6 @@ module.exports = async (
     aboutAlternative,
     positions,
     educations,
-    skills,
-    recommendations: {
-      givenCount: recommendationsCount ? recommendationsCount.given : "0",
-      receivedCount: recommendationsCount ? recommendationsCount.received : "0",
-      given: recommendationsReceived,
-      received: recommendationsGiven
-    },
-    accomplishments,
-    peopleAlsoViewed,
-    volunteerExperience,
     interests
   };
 

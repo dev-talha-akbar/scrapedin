@@ -111,7 +111,7 @@ function showMore() {
   });
 }
 
-function showProfiles(profiles) {
+function showProfiles(profiles, chunkIndex) {
   const profilesMarkup = profiles
     .map(profile => {
       const emails = profile.contact.filter(item => item.type === "Email");
@@ -227,7 +227,11 @@ function showProfiles(profiles) {
     .join("");
 
   $("#connections-data").replaceWith($("#connections-data").clone());
-  $("#connections-data").html(profilesMarkup);
+  if (chunkIndex !== 0) {
+    $("#connections-data").append(profilesMarkup);
+  } else {
+    $("#connections-data").html(profilesMarkup);
+  }
   $(".lazy").Lazy({
     threshold: 0,
     throttle: 2000
@@ -256,7 +260,7 @@ function search(e) {
   showLoading();
 
   $.post("/search", $(e.target).serialize())
-    .then(showProfiles)
+    .then(chunkShowProfiles)
     .catch(err => {
       showError();
     });
@@ -305,12 +309,62 @@ function initSelect2($elem, placeholder) {
   });
 }
 
+function chunk(arr, len) {
+  var chunks = [],
+    i = 0,
+    n = arr.length;
+
+  while (i < n) {
+    chunks.push(arr.slice(i, (i += len)));
+  }
+
+  return chunks;
+}
+
+function debounce(func, wait, immediate) {
+  var timeout;
+  return function() {
+    var context = this,
+      args = arguments;
+    var later = function() {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    var callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
+}
+
+function chunkShowProfiles(profiles) {
+  let chunkIndex = 0;
+  const profileChunks = chunk(profiles, 100);
+
+  showProfiles(profileChunks[0], chunkIndex);
+
+  window.onscroll = debounce(function() {
+    if (
+      document.documentElement.scrollTop + window.innerHeight >
+      document.documentElement.scrollHeight - 600
+    ) {
+      chunkIndex++;
+      if (profileChunks[chunkIndex]) {
+        showProfiles(profileChunks[chunkIndex], chunkIndex);
+      } else {
+        window.onscroll = undefined;
+        return;
+      }
+    }
+  }, 200);
+}
+
 $(function() {
   initSelect2($("#filter-tags"), "Filter tags");
 
   $("#search-form").on("submit", search);
 
-  $("#connections-data").on("click", ".view-profile", showMore);
+  $(document).on("click", ".view-profile", showMore);
 
-  $.get("/profiles").then(showProfiles);
+  $.get("/profiles").then(chunkShowProfiles);
 });
