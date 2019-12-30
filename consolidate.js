@@ -12,9 +12,14 @@ for (let i = 0; i <= 12; i++) {
 
     if (profile && profile.publicIdentifier) {
       allProfiles.push({
-        name: `${profile.firstName} ${profile.lastName}`,
-        occupation: profile.occupation,
+        profile: {
+          name: `${profile.firstName} ${profile.lastName}`,
+          headline: profile.occupation
+        },
+        tags: [],
+        contact: [],
         username: profile.publicIdentifier,
+        basic: true,
         avatar:
           profile.picture &&
           `${profile.picture.rootUrl}${profile.picture.artifacts[0].fileIdentifyingUrlPathSegment}`

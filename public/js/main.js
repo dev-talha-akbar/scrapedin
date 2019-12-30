@@ -121,15 +121,17 @@ function showProfiles(profiles) {
       <tr>
         <td style="min-width: 50%;">
           <div class="d-flex align-items-center">
-            <img class="avatar" width="70" height="70" style="border-radius: 100%; margin-right: 10px; border: 1px solid #ccc;" src="${
-              profile.avatar.indexOf("base64") > -1
+            <img class="avatar lazy" width="70" height="70" style="border-radius: 100%; margin-right: 10px; border: 1px solid #ccc;" src="/img/default-avatar.jpg" data-src="${
+              !profile.avatar || profile.avatar.indexOf("base64") > -1
                 ? "/img/default-avatar.jpg"
                 : profile.avatar
             }" alt="${profile.username}">
             <div>
-              <a href="javascript:void(0)" class="view-profile" data-username="${
-                profile.username
-              }">${profile.profile.name}</a>
+              ${
+                profile.basic
+                  ? `<a href="javascript:void(0)" class="view-profile" data-username="${profile.username}">${profile.profile.name}</a>`
+                  : `<b>${profile.profile.name}</b>`
+              }
               <span>(@${profile.username})</span>
               <br>
               ${profile.profile.headline}
@@ -205,6 +207,11 @@ function showProfiles(profiles) {
     .join("");
 
   $("#connections-data").html(profilesMarkup);
+  $(".lazy").Lazy({
+    combined: true,
+    threshold: 100,
+    throttle: 5000
+  });
 }
 
 function showLoading() {

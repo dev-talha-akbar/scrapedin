@@ -94,10 +94,6 @@ module.exports = async (
   const peopleAlsoViewed = await scrapSection(page, template.peopleAlsoViewed);
   const interests = await scrapSection(page, template.interests);
 
-  await new Promise((resolve, reject) => {
-    setTimeout(resolve, Math.random() * 2500 + 2000);
-  });
-
   await page.close();
   logger.info("profile", `finished scraping url: ${url}`);
 

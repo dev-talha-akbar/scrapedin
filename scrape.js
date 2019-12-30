@@ -65,7 +65,7 @@ async function scrape() {
         }
 
         console.info(`Fetching profile for ${name} @ ${profileLink}`);
-        const profile = await Scraper.profileScraper(profileLink);
+        const profile = await Scraper.profileScraper(profileLink, 120000);
 
         let tags = [];
 
