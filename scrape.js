@@ -63,17 +63,21 @@ async function scrape() {
 
       console.log(profile);
 
+      const profileData = {
+        ...profile,
+        tags,
+        avatar,
+        username,
+        basic: false
+      };
+
+      profileData.profile.name = name;
+
       await profilesCollection.replaceOne(
         {
           _id
         },
-        {
-          ...profile,
-          tags,
-          avatar,
-          username,
-          basic: false
-        }
+        profileData
       );
 
       processed++;
