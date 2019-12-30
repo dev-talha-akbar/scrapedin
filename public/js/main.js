@@ -226,11 +226,11 @@ function showProfiles(profiles) {
     })
     .join("");
 
+  $("#connections-data").replaceWith($("#connections-data").clone());
   $("#connections-data").html(profilesMarkup);
   $(".lazy").Lazy({
-    combined: true,
-    threshold: 100,
-    throttle: 5000
+    threshold: 0,
+    throttle: 2000
   });
 }
 

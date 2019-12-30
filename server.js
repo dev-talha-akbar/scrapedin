@@ -74,7 +74,8 @@ app.post("/search", async (req, res) => {
     "profile.name": 1,
     "profile.headline": 1,
     contact: 1,
-    tags: 1
+    tags: 1,
+    basic: 1
   });
 
   dbProfiles.each((err, item) => {
@@ -122,7 +123,8 @@ app.get("/profiles", async (req, res) => {
     "profile.name": 1,
     "profile.headline": 1,
     contact: 1,
-    tags: 1
+    tags: 1,
+    basic: 1
   });
 
   dbProfiles.each((err, item) => {
