@@ -40,6 +40,20 @@ app.post("/search", async (req, res) => {
       $or: [
         { "profile.name": new RegExp(search_term, "i") },
         { "profile.headline": new RegExp(search_term, "i") },
+        { "profile.summary": new RegExp(search_term, "i") },
+        {
+          contact: {
+            $elemMatch: {
+              values: {
+                $elemMatch: {
+                  $regex: search_term,
+                  $options: "i"
+                }
+              }
+            }
+          }
+        },
+        { location: new RegExp(search_term, "i") },
         { username: new RegExp(search_term, "i") }
       ]
     };

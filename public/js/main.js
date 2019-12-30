@@ -20,7 +20,7 @@ function showMore() {
   $.get(`/profile/${username}`).then(profile => {
     const $moreView = $('<tr class="more-view"></tr>');
     $moreView.append(`
-      <td colspan="4">
+      <td colspan="6">
       <div class="more-view-content">
         <h5>More Information</h5>
         <div>
@@ -116,6 +116,8 @@ function showProfiles(profiles) {
     .map(profile => {
       const emails = profile.contact.filter(item => item.type === "Email");
       const phones = profile.contact.filter(item => item.type === "Phone");
+      const location = profile.location;
+      const websites = profile.contact.filter(item => item.type === "Website");
 
       return `
       <tr>
@@ -128,7 +130,7 @@ function showProfiles(profiles) {
             }" alt="${profile.username}">
             <div>
               ${
-                profile.basic
+                !profile.basic
                   ? `<a href="javascript:void(0)" class="view-profile" data-username="${profile.username}">${profile.profile.name}</a>`
                   : `<b>${profile.profile.name}</b>`
               }
@@ -201,6 +203,24 @@ function showProfiles(profiles) {
             </div>
           </div>
         </td>
+        <td>
+          <div class="d-flex align-items-center" style="padding-top: 10px; width: 100%;">
+            <div>
+            ${location ? location : '<em class="text-muted">Not available</em>'}
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="d-flex align-items-center" style="padding-top: 10px; width: 100%;">
+            <div>
+            ${
+              websites.length > 0
+                ? websites.map(item => `${item.values.join("<br>")}`).join("")
+                : '<em class="text-muted">Not available</em>'
+            }
+            </div>
+          </div>
+        </td>
       </tr>
       `;
     })
@@ -217,7 +237,7 @@ function showProfiles(profiles) {
 function showLoading() {
   $("#connections-data").html(`
     <tr>
-      <td colspan="4">Loading...</td>
+      <td colspan="6">Loading...</td>
     </tr>
   `);
 }
@@ -225,7 +245,7 @@ function showLoading() {
 function showError() {
   $("#connections-data").html(`
     <tr>
-      <td colspan="4"><span class="text-danger">Error</span></td>
+      <td colspan="6"><span class="text-danger">Error</span></td>
     </tr>
   `);
 }
