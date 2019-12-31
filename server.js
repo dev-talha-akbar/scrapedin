@@ -20,7 +20,7 @@ app.post("/search", async (req, res) => {
   const profilesCollection = db.collection("profiles");
   const profiles = [];
 
-  const { search_term, filter_tags } = req.body;
+  let { search_term, filter_tags } = req.body;
 
   const filter_tags_arr = filter_tags
     ? typeof filter_tags === "string"
@@ -28,6 +28,12 @@ app.post("/search", async (req, res) => {
       : filter_tags
     : [];
   const filter_tags_regexp = filter_tags_arr.map(tag => new RegExp(tag, "i"));
+  const search_term_parts = search_term.split("@");
+  const search_scraped = search_term_parts.reverse()[0] === "scraped";
+
+  if (search_scraped) {
+    search_term = search_term.replace(/@scraped$/, "");
+  }
 
   let searchFilter;
 
@@ -35,8 +41,16 @@ app.post("/search", async (req, res) => {
     searchFilter = {};
   }
 
+  if (search_scraped) {
+    searchFilter = {
+      ...searchFilter,
+      basic: false
+    };
+  }
+
   if (search_term) {
     searchFilter = {
+      ...searchFilter,
       $or: [
         { "profile.name": new RegExp(search_term, "i") },
         { "profile.headline": new RegExp(search_term, "i") },

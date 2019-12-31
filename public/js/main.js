@@ -343,22 +343,24 @@ function chunkShowProfiles(profiles) {
   let chunkIndex = 0;
   const profileChunks = chunk(profiles, 100);
 
-  showProfiles(profileChunks[0], chunkIndex);
+  if (profileChunks.length) {
+    showProfiles(profileChunks[0], chunkIndex);
 
-  window.onscroll = debounce(function() {
-    if (
-      document.documentElement.scrollTop + window.innerHeight >
-      document.documentElement.scrollHeight - 600
-    ) {
-      chunkIndex++;
-      if (profileChunks[chunkIndex]) {
-        showProfiles(profileChunks[chunkIndex], chunkIndex);
-      } else {
-        window.onscroll = undefined;
-        return;
+    window.onscroll = debounce(function() {
+      if (
+        document.documentElement.scrollTop + window.innerHeight >
+        document.documentElement.scrollHeight - 600
+      ) {
+        chunkIndex++;
+        if (profileChunks[chunkIndex]) {
+          showProfiles(profileChunks[chunkIndex], chunkIndex);
+        } else {
+          window.onscroll = undefined;
+          return;
+        }
       }
-    }
-  }, 200);
+    }, 200);
+  }
 }
 
 $(function() {
