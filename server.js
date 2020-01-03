@@ -1,7 +1,7 @@
-require("dotenv").config();
+require("dotenv").config({ path: __dirname + "/.env" });
 
 const { MONGODB_URI } = process.env;
-
+console.log(process.env);
 const express = require("express");
 const bodyParser = require("body-parser");
 const MongoClient = require("mongodb").MongoClient;
@@ -11,8 +11,8 @@ const app = express();
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get("/", function() {
-  res.sendFile("public/index.html");
+app.get("/", function(req, res) {
+  res.sendFile(__dirname + "/public/index.html");
 });
 
 app.post("/search", async (req, res) => {
@@ -132,16 +132,18 @@ app.get("/profiles", async (req, res) => {
   const db = await MongoClient.connect(MONGODB_URI);
   const profilesCollection = db.collection("profiles");
   const profiles = [];
-  const dbProfiles = await profilesCollection.find(undefined, {
-    username: 1,
-    avatar: 1,
-    "profile.name": 1,
-    "profile.headline": 1,
-    "profile.location": 1,
-    contact: 1,
-    tags: 1,
-    basic: 1
-  });
+  const dbProfiles = await profilesCollection
+    .find(undefined, {
+      username: 1,
+      avatar: 1,
+      "profile.name": 1,
+      "profile.headline": 1,
+      "profile.location": 1,
+      contact: 1,
+      tags: 1,
+      basic: 1
+    })
+    .limit(100);
 
   dbProfiles.each((err, item) => {
     if (item === null) {

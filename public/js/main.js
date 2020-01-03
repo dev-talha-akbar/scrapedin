@@ -360,6 +360,8 @@ function chunkShowProfiles(profiles) {
         }
       }
     }, 200);
+  } else {
+    showProfiles([], 0);
   }
 }
 
