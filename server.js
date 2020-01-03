@@ -1,7 +1,7 @@
 require("dotenv").config({ path: __dirname + "/.env" });
 
 const { MONGODB_URI } = process.env;
-console.log(process.env);
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const MongoClient = require("mongodb").MongoClient;
@@ -154,6 +154,16 @@ app.get("/profiles", async (req, res) => {
 
     profiles.push(item);
   });
+});
+
+app.get("/scraped-profiles-count", async (req, res) => {
+  const db = await MongoClient.connect(MONGODB_URI);
+  const profilesCollection = db.collection("profiles");
+  const count = await profilesCollection.count({
+    basic: false
+  });
+
+  res.json(count);
 });
 
 app.get("/profile/:username", async (req, res) => {

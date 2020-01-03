@@ -373,4 +373,7 @@ $(function() {
   $(document).on("click", ".view-profile", showMore);
 
   $.get("/profiles").then(chunkShowProfiles);
+  $.get("/scraped-profiles-count").then(count => {
+    $("#scraped-count").html(`<small><b>${count} Profiles Scraped</b></small>`);
+  });
 });
