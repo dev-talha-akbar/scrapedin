@@ -25,11 +25,11 @@ function showMore() {
         <h5>More Information</h5>
         <div>
           <b>Location:</b> ${profile.profile.location ||
-            '<em class="text-muted">Not available</em>'}
+            '<em class="text-muted">&#x25CF;</em>'}
         </div>
         <div>
           <b>Connections:</b> ${profile.profile.connections ||
-            '<em class="text-muted">Not available</em>'}
+            '<em class="text-muted">&#x25CF;</em>'}
         </div>
         <div class="d-flex align-items-center">
             <div>
@@ -39,8 +39,10 @@ function showMore() {
             </div>
           </div>
         <div>
-          <b>Summary:</b> ${profile.profile.summary ||
-            '<em class="text-muted">Not available</em>'}
+          <b>Summary:</b>
+          <div class="summary">
+          ${profile.profile.summary || '<em class="text-muted">&#x25CF;</em>'}
+          </div>
         </div>
 
         <h5>Positions</h5>
@@ -116,14 +118,20 @@ function showMore() {
 function showProfiles(profiles, chunkIndex) {
   const profilesMarkup = profiles
     .map(profile => {
-      const emails = profile.contact.filter(item => item.type === "Email");
-      const phones = profile.contact.filter(item => item.type === "Phone");
+      const emails = profile.contact.filter(
+        item => item.type === "Email" || item.type === "Emails"
+      );
+      const phones = profile.contact.filter(
+        item => item.type === "Phone" || item.type === "Phones"
+      );
       const location = profile.profile.location;
-      const websites = profile.contact.filter(item => item.type === "Website");
+      const websites = profile.contact.filter(
+        item => item.type === "Website" || item.type === "Websites"
+      );
 
       return `
       <tr>
-        <td style="min-width: 50%;">
+        <td style="min-width: 250px;">
           <div class="d-flex align-items-center">
             <img class="avatar lazy" width="70" height="70" style="border-radius: 100%; margin-right: 10px; border: 1px solid #ccc;" src="/img/default-avatar.jpg" data-src="${
               !profile.avatar || profile.avatar.indexOf("base64") > -1
@@ -136,21 +144,20 @@ function showProfiles(profiles, chunkIndex) {
                   ? `<a href="javascript:void(0)" class="view-profile" data-username="${profile.username}">${profile.profile.name}</a>`
                   : `<b>${profile.profile.name}</b>`
               }
-              <span>(@${profile.username})</span>
               <br>
-              ${profile.profile.headline}
+              <span class="headline">${profile.profile.headline}</span>
             </div>
           </div>
         </td>
-        <td style="width: 25%;">
-          <div class="contact-tags-container" style="padding-top: 10px; width: 100%;">
+        <td style="min-width: 200px; font-size: 13px;">
+          <div class="contact-tags-container" style="padding-top: 12px; width: 100%;">
             <div style="width: 100%">
             <div class="contact-tags">
               <span class="tags">
                 ${
                   profile.tags && profile.tags.length > 0
-                    ? profile.tags.join(", ")
-                    : '<em class="text-muted">No tags yet...</em>'
+                    ? profile.tags.map(tag => `<b>${tag}</b>`).join(", ")
+                    : '<span class="text-muted">Untagged</span>'
                 }
               </span>
               <a href="javascript:void(0)" onclick="editTags(this)" style="font-size: 0.75rem;">Edit</a>
@@ -183,42 +190,59 @@ function showProfiles(profiles, chunkIndex) {
             </div>
           </div>
         </td>
-        <td>
-          <div class="d-flex align-items-center" style="padding-top: 10px; width: 100%;">
+        <td style="max-width: 200px; font-size: 13px;">
+          <div class="d-flex align-items-center" style="padding-top: 12px; width: 100%;">
             <div>
             ${
               emails.length > 0
                 ? emails.map(item => `${item.values.join("<br>")}`).join("")
-                : '<em class="text-muted">Not available</em>'
+                : '<em class="text-muted">&#x25CF;</em>'
             }
             </div>
           </div>
         </td>
-        <td>
-          <div class="d-flex align-items-center" style="padding-top: 10px; width: 100%;">
+        <td style="font-size: 13px;">
+          <div class="d-flex align-items-center" style="padding-top: 12px; width: 100%;">
             <div>
             ${
               phones.length > 0
                 ? phones.map(item => `${item.values.join("<br>")}`).join("")
-                : '<em class="text-muted">Not available</em>'
+                : '<em class="text-muted">&#x25CF;</em>'
             }
             </div>
           </div>
         </td>
-        <td>
-          <div class="d-flex align-items-center" style="padding-top: 10px; width: 100%;">
+        <td style="min-width: 200px; font-size: 13px;">
+          <div class="d-flex align-items-center" style="padding-top: 12px; width: 100%;">
             <div>
-            ${location ? location : '<em class="text-muted">Not available</em>'}
+            ${location ? location : '<em class="text-muted">&#x25CF;</em>'}
             </div>
           </div>
         </td>
-        <td>
-          <div class="d-flex align-items-center" style="padding-top: 10px; width: 100%;">
+        <td style="min-width: 200px; font-size: 13px;">
+          <div class="d-flex align-items-center" style="padding-top: 12px; width: 100%;">
             <div>
             ${
               websites.length > 0
-                ? websites.map(item => `${item.values.join("<br>")}`).join("")
-                : '<em class="text-muted">Not available</em>'
+                ? websites
+                    .map(
+                      item =>
+                        `${item.values
+                          .map(website => {
+                            return website.replace(/(.*)\((.*)\)/, function(
+                              string,
+                              link,
+                              title
+                            ) {
+                              return `<a class="website" target="_blank" href="http://${$.trim(
+                                link
+                              )}">${$.trim(title)}</a>`;
+                            });
+                          })
+                          .join("<br>")}`
+                    )
+                    .join("")
+                : '<em class="text-muted">&#x25CF;</em>'
             }
             </div>
           </div>
@@ -278,9 +302,11 @@ function saveTags(elem) {
   if (tags.length === 0) {
     $parent
       .find(".contact-tags .tags")
-      .html('<em class="text-muted">No tags yet...</em>');
+      .html('<span class="text-muted">Untagged</span>');
   } else {
-    $parent.find(".contact-tags .tags").html(tags.join(", "));
+    $parent
+      .find(".contact-tags .tags")
+      .html(tags.map(tag => `<b>${tag}</b>`).join(", "));
   }
 
   $.post(`/profile/${username}/tags`, { tags });

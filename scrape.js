@@ -59,7 +59,7 @@ async function scrape() {
       const url = `https://www.linkedin.com/in/${username}`;
 
       console.info(`Fetching profile for ${name} @ ${url}`);
-      const profile = await Scraper.profileScraper(url, 45000);
+      const profile = await Scraper.profileScraper(url, 30000 + (Math.random() * 45000));
 
       console.log(profile);
 
