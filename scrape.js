@@ -61,7 +61,7 @@ async function scrape() {
       console.info(`Fetching profile for ${name} @ ${url}`);
       const profile = await Scraper.profileScraper(
         url,
-        90000 + Math.random() * 45000
+        45000 + Math.random() * 60000
       );
 
       console.log(profile);
