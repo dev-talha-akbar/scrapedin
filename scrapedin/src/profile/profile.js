@@ -86,7 +86,7 @@ module.exports = async (
   const interests = await scrapSection(page, template.interests);
 
   setTimeout(() => {
-    window.clearInterval(INTERVAL);
+    clearInterval(INTERVAL);
     page.close();
   }, parseInt(waitTimeToScrapMs + (Math.random() * (waitTimeToScrapMs * 3), 10)));
   logger.info("profile", `finished scraping url: ${url}`);
