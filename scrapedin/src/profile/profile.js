@@ -19,15 +19,21 @@ module.exports = async (
   const page = await openPage(browser, cookies, url);
   const profilePageIndicatorSelector = ".pv-profile-section";
 
-  const INTERVAL = setInterval(function() {
-    page.evaluate(() => window.scrollTo(0, parseInt(Math.random() * 500), 10));
-    page.mouse.move(
-      parseInt(Math.random() * 500, 10),
-      parseInt(Math.random() * 500, 10),
-      {
-        steps: Math.random() * 100
-      }
-    );
+  const INTERVAL = setInterval(() => {
+    if (!page.isClosed()) {
+      page.evaluate(() =>
+        window.scrollTo(0, parseInt(Math.random() * 500), 10)
+      );
+      page.mouse.move(
+        parseInt(Math.random() * 500, 10),
+        parseInt(Math.random() * 500, 10),
+        {
+          steps: Math.random() * 100
+        }
+      );
+    } else {
+      clearInterval(INTERVAL);
+    }
   }, parseInt(Math.random() * 500, 10));
 
   await page
@@ -86,7 +92,6 @@ module.exports = async (
   const interests = await scrapSection(page, template.interests);
 
   setTimeout(() => {
-    clearInterval(INTERVAL);
     page.close();
   }, parseInt(waitTimeToScrapMs + (Math.random() * (waitTimeToScrapMs * 3), 10)));
   logger.info("profile", `finished scraping url: ${url}`);
