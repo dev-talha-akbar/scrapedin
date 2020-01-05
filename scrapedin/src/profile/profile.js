@@ -19,23 +19,6 @@ module.exports = async (
   const page = await openPage(browser, cookies, url);
   const profilePageIndicatorSelector = ".pv-profile-section";
 
-  const INTERVAL = setInterval(() => {
-    if (!page.isClosed()) {
-      page.evaluate(() =>
-        window.scrollTo(0, parseInt(Math.random() * 500), 10)
-      );
-      page.mouse.move(
-        parseInt(Math.random() * 500, 10),
-        parseInt(Math.random() * 500, 10),
-        {
-          steps: Math.random() * 100
-        }
-      );
-    } else {
-      clearInterval(INTERVAL);
-    }
-  }, parseInt(Math.random() * 500, 10));
-
   await page
     .waitFor(profilePageIndicatorSelector, { timeout: 5000 })
     .catch(() => {
