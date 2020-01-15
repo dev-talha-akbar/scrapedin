@@ -35,12 +35,14 @@ app.post("/search", async (req, res) => {
     search_term = search_term.replace(/@scraped$/, "");
   }
 
-  search_term = search_term
-    .split(",")
-    .map(term => {
-      return `(?=.*${term.trim()})`;
-    })
-    .join("");
+  if (search_term.split(",").length > 1) {
+    search_term = search_term
+      .split(",")
+      .map(term => {
+        return `(?=.*${term.trim()})`;
+      })
+      .join("");
+  }
 
   let searchFilter;
 
