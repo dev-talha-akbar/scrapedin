@@ -35,6 +35,13 @@ app.post("/search", async (req, res) => {
     search_term = search_term.replace(/@scraped$/, "");
   }
 
+  search_term = search_term
+    .split(",")
+    .map(term => {
+      return `(?=.*${term.trim()})`;
+    })
+    .join("");
+
   let searchFilter;
 
   if (search_term || filter_tags_regexp.length) {
@@ -64,6 +71,17 @@ app.post("/search", async (req, res) => {
                   $options: "i"
                 }
               }
+            }
+          }
+        },
+        {
+          educations: {
+            $elemMatch: {
+              $or: [
+                { title: new RegExp(search_term, "i") },
+                { fieldofstudy: new RegExp(search_term, "i") },
+                { degree: new RegExp(search_term, "i") }
+              ]
             }
           }
         },
